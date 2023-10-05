@@ -1,10 +1,8 @@
-import React from "react";
 import Konva from "konva";
 import { useLayoutEffect } from "react"
-import { ExamFunctions } from "../../store/exam/functions";
-import { ExamHook } from "../../store/exam/hooks";
 import { QuestionRender } from "question-convert";
 import { EXAM_STATUS } from "../../constants";
+import { onDrawLine } from "../types";
 
 const RADIUS = 6;
 
@@ -96,8 +94,17 @@ const border = (question: QuestionRender, connect: string, is_view?: boolean) =>
 }
 
 
-const ConnectImage = ({ question, is_view }: { question: QuestionRender, is_view?: boolean }) => {
-    const is_doing = ExamHook.useIsDoing();
+const ConnectImage = ({ 
+    question, 
+    is_view, 
+    onDrawLine,
+    exam_status, 
+}: { 
+    question: QuestionRender, 
+    is_view?: boolean,
+    onDrawLine: onDrawLine,
+    exam_status: number,
+ }) => {
 
     useLayoutEffect(() => {
         const container = document.querySelector('#stage-parent');
@@ -150,7 +157,7 @@ const ConnectImage = ({ question, is_view }: { question: QuestionRender, is_view
 
 
                 line_current.on("mousedown", (e) => {
-                    if (is_doing !== EXAM_STATUS.VIEW) {
+                    if (exam_status !== EXAM_STATUS.VIEW) {
                         const cx = stage.getPointerPosition()?.x;
                         const cy = stage.getPointerPosition()?.y;
                         // console.log({cx, cy})
@@ -190,7 +197,7 @@ const ConnectImage = ({ question, is_view }: { question: QuestionRender, is_view
                 layer.add(line_current);
             }
             stage.on('mousemove', () => {
-                if (is_drawing && is_doing !== EXAM_STATUS.VIEW) {
+                if (is_drawing && exam_status !== EXAM_STATUS.VIEW) {
                     const pos = stage.getPointerPosition();
                     if (pos?.x && pos?.y) {
                         point_pos[2] = pos.x;
@@ -208,9 +215,9 @@ const ConnectImage = ({ question, is_view }: { question: QuestionRender, is_view
                 is_drawing = false;
                 if (point_pos.length) {
                     const n_points = resetPoint(point_pos, points);
-                    ExamFunctions.drawLine(line_connect_cur);
+                    onDrawLine(line_connect_cur);
                     line_connect_cur = { src: '', dist: '' }
-                    ExamFunctions.drawLine(getConnect(n_points, points))
+                    onDrawLine(getConnect(n_points, points))
                     e.target.setAttr("points", n_points)
                 }
                 point_pos = [];

@@ -1,33 +1,35 @@
 import React, { useMemo } from "react";
 import {
+  AnswerRender,
+  ExamResult,
   ITEM_TYPE,
   S_ANSWER_CORRECT,
   S_ANSWER_WRONG,
   S_UNANSWER,
 } from "question-convert";
-import { ExamHook } from "../../store/exam/hooks";
 import { QuestionRender } from "question-convert";
 import DropList from "../components/DropList";
 import Image from "../components/Image";
 import Text from "../components/Text";
 import checkCorectSolution from "../../helper/checkCorectSolution";
 import checkStatusAnswer from "../../helper/checkStatusAnswer";
+import { onAnswerQuestion } from "../types";
 
 const Answers = ({
   a_index,
   answer,
   is_view,
-  q_id,
-  question
+  question,
+  exam_result,
+  onAnswerQuestion,
 }: {
-  a_index: any;
-  answer: any;
-  is_view: any;
-  q_id: number;
-  question: any;
+  a_index: number;
+  answer: AnswerRender;
+  is_view?: boolean;
+  question: QuestionRender;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
-  // const questionCurrent: any = ExamHook.useQuestionCurrent();
-  const result = ExamHook.useResult();
   const checkAns = useMemo(() => {
     let check_result = S_UNANSWER;
     answer.content.map((_: any, i_index: any) => {
@@ -50,7 +52,7 @@ const Answers = ({
       key={a_index}
       className={`flex-1 flex-col p-5 m-2 border-2 
                 border-dashed rounded-[10px] justify-end
-                border-[#FF6700] ${result &&
+                border-[#FF6700] ${exam_result &&
         (!is_view
           ? checkStatusAnswer(checkAns)
           : checkCorectSolution(answer, a_index, question))
@@ -73,7 +75,9 @@ const Answers = ({
                 i_index={i_index}
                 is_view={is_view}
                 className={"text-lg mx-1"}
-                q_id={q_id}
+                question={question}
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
               />
             )}
             {item.type == ITEM_TYPE.TEXT && typeof item.data == "string" && (
@@ -91,9 +95,13 @@ const Answers = ({
 const DropListImage = ({
   question,
   is_view,
+  exam_result,
+  onAnswerQuestion,
 }: {
   question: QuestionRender;
   is_view?: boolean;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
   return (
     <div className="flex flex-row mt-5 min-w-[600px] justify-center">
@@ -104,7 +112,8 @@ const DropListImage = ({
             a_index={a_index}
             answer={answer}
             is_view={is_view}
-            q_id={question.id}
+            exam_result={exam_result}
+            onAnswerQuestion={onAnswerQuestion}
           />
         </React.Fragment>
       ))}

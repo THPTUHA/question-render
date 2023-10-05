@@ -1,6 +1,5 @@
-import React, { useMemo } from "react";
-import { ITEM_TYPE, S_ANSWER_CORRECT, S_ANSWER_WRONG, S_UNANSWER } from "question-convert";
-import { ExamHook } from "../../store/exam/hooks";
+import { useMemo } from "react";
+import { AnswerRender, ExamResult, ITEM_TYPE, S_ANSWER_CORRECT, S_ANSWER_WRONG, S_UNANSWER } from "question-convert";
 import { QuestionRender } from "question-convert";
 import FractionCH009 from "../components/FractionCH009";
 import Selection from "../components/Selection";
@@ -8,10 +7,23 @@ import Text from "../components/Text";
 import formatUnit from "../../helper/formatUnit";
 import checkCorectSolution from "../../helper/checkCorectSolution";
 import checkStatusAnswer from "../../helper/checkStatusAnswer";
+import { onAnswerQuestion } from "../types";
 
-const Answers = ({ answer, is_view, a_index, q_id, question }: { answer: any, is_view?: boolean, a_index: number, q_id: number, question: any }) => {
-  // const questionCurrent: any = ExamHook.useQuestionCurrent();
-  const result = ExamHook.useResult();
+const Answers = ({
+  answer,
+  is_view,
+  a_index,
+  question,
+  exam_result,
+  onAnswerQuestion,
+}: {
+  answer: AnswerRender,
+  is_view?: boolean,
+  a_index: number,
+  question: QuestionRender,
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
+}) => {
 
   const checkAns = useMemo(() => {
     let check_result = S_UNANSWER;
@@ -36,7 +48,7 @@ const Answers = ({ answer, is_view, a_index, q_id, question }: { answer: any, is
   return (
     <div className={`flex-1  border-2 items-center 
                     border-dashed rounded-[10px] border-[#FF6700] 
-                    py-2 px-10 m-2 ${result && (!is_view ? checkStatusAnswer(checkAns) : checkCorectSolution(answer, 0, question))}`}>
+                    py-2 px-10 m-2 ${exam_result && (!is_view ? checkStatusAnswer(checkAns) : checkCorectSolution(answer, 0, question))}`}>
       {answer.content.map((item: any, i_index: number) => {
         return (
 
@@ -54,7 +66,9 @@ const Answers = ({ answer, is_view, a_index, q_id, question }: { answer: any, is
                     a_index={0}
                     i_index={0}
                     is_view={true}
-                    q_id={q_id}
+                    question={question}
+                    exam_result={exam_result}
+                    onAnswerQuestion={onAnswerQuestion}
                   />
                 </span>
               )}
@@ -68,9 +82,13 @@ const Answers = ({ answer, is_view, a_index, q_id, question }: { answer: any, is
 const ChooseTrueFalse = ({
   question,
   is_view,
+  exam_result,
+  onAnswerQuestion,
 }: {
   question: QuestionRender;
   is_view?: boolean;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
   return (
     <div className="px-10 pt-5">
@@ -82,7 +100,14 @@ const ChooseTrueFalse = ({
       </div>
       {question.answers.map((answer, a_index) => (
         <div key={a_index} className="flex items-center justify-between">
-          <Answers question={question} answer={answer} is_view={is_view} a_index={a_index} q_id={question.id} />
+          <Answers
+            question={question}
+            answer={answer}
+            is_view={is_view}
+            a_index={a_index}
+            exam_result={exam_result}
+            onAnswerQuestion={onAnswerQuestion}
+          />
           <div>
             {answer.content.map((_, i_index) => (
               <div key={i_index} className="flex flex-row">
@@ -95,7 +120,8 @@ const ChooseTrueFalse = ({
                         a_index={a_index}
                         choose={"D"}
                         is_view={is_view}
-                        q_id={question.id}
+                        question={question}
+                        onAnswerQuestion={onAnswerQuestion}
                       />
                     </div>
                     <div className=" items-center flex">
@@ -105,7 +131,8 @@ const ChooseTrueFalse = ({
                         a_index={a_index}
                         choose={"S"}
                         is_view={is_view}
-                        q_id={question.id}
+                        question={question}
+                        onAnswerQuestion={onAnswerQuestion}
                       />
                     </div>
                   </div>

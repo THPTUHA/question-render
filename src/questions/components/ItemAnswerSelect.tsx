@@ -1,14 +1,17 @@
-import React from "react";
 import {
+  AnswerRender,
+  ExamResult,
   ITEM_TYPE,
+  QuestionRender,
   S_ANSWER_WRONG,
 } from "question-convert";
-import { ExamHook } from "../../store/exam/hooks";
 import AudioPlay from "./AudioPlay";
 import Fraction from "./Fraction";
 import Text from "./Text";
 import Selection from "./Selection";
 import formatUnit from "../../helper/formatUnit";
+import { onAnswerQuestion } from "../types";
+import { getPupilAnswer, getQuestionSolution } from "../../utils";
 
 const setColorAnswer = ({
   status,
@@ -40,27 +43,30 @@ const ItemAnswerCh010 = ({
   a_index,
   i_index,
   is_view,
-  q_id,
+  question,
   answer,
+  exam_result,
+  onAnswerQuestion,
 }: {
   id: string;
   a_index: number;
   i_index: number;
   choose?: string;
   is_view?: boolean;
-  q_id: number;
-  answer: any;
+  question: QuestionRender;
+  answer: AnswerRender;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
-  const answer_pupil = ExamHook.useAnswerPupil({ a_index, i_index, q_id });
-  const solution = ExamHook.useSolution({ a_index, i_index, q_id });
-  const status = ExamHook.useQuestionStatus(q_id);
+  const answer_pupil = getPupilAnswer(question,{ a_index, i_index });
+  const solution = getQuestionSolution(question,{ a_index, i_index });
 
   return (
     <div
       key={a_index}
       className={`mb-5 flex grow border-2 rounded-[10px] py-2 items-center px-4 mx-5 border-[#FF6700] ${setColorAnswer(
         {
-          status,
+          status: question.status,
           answer_pupil,
           is_view,
           solution,
@@ -74,7 +80,8 @@ const ItemAnswerCh010 = ({
             a_index={a_index}
             i_index={0}
             is_view={is_view}
-            q_id={q_id}
+            question={question}
+            onAnswerQuestion={onAnswerQuestion}
           />
         )}
       </span>
@@ -99,7 +106,9 @@ const ItemAnswerCh010 = ({
                 a_index={0}
                 i_index={0}
                 is_view={true}
-                q_id={q_id}
+                question={question}
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
               />
             </div>
           )}

@@ -1,18 +1,29 @@
 import React, { useMemo } from 'react';
-import { ITEM_TYPE, S_ANSWER_CORRECT, S_ANSWER_WRONG, S_UNANSWER } from "question-convert";
+import { AnswerRender, ExamResult, ITEM_TYPE, S_ANSWER_CORRECT, S_ANSWER_WRONG, S_UNANSWER } from "question-convert";
 import { QuestionRender } from "question-convert";
 import InputWord from "../components/InputWord";
 import Image from "../components/Image";
 import Text from "../components/Text";
 import AudioPlay from "../components/AudioPlay";
-import { ExamHook } from '../../store/exam/hooks';
 import checkCorectSolution from '../../helper/checkCorectSolution';
 import checkStatusAnswer from '../../helper/checkStatusAnswer';
+import { onAnswerQuestion } from '../types';
 
-const Answers = ({ a_index, answer, is_view, q_id, question }:
-  { a_index: any, answer: any, is_view: any, q_id: number, question: any }) => {
-  // const questionCurrent: any = ExamHook.useQuestionCurrent();
-  const result = ExamHook.useResult();
+const Answers = ({
+  a_index,
+  answer,
+  is_view,
+  question,
+  exam_result,
+  onAnswerQuestion,
+}: {
+  a_index: number,
+  answer: AnswerRender,
+  is_view?: boolean,
+  question: QuestionRender,
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
+}) => {
   const checkAns = useMemo(() => {
     let check_result = S_UNANSWER;
     answer.content.map((_: any, i_index: any) => {
@@ -33,7 +44,7 @@ const Answers = ({ a_index, answer, is_view, q_id, question }:
       key={a_index}
       className={`flex flex-col p-5 m-2 border-2 
                 border-dashed rounded-[10px] border-[#FF6700]
-                ${result && (!is_view ? checkStatusAnswer(checkAns) : checkCorectSolution(answer, a_index, question))}`}
+                ${exam_result && (!is_view ? checkStatusAnswer(checkAns) : checkCorectSolution(answer, a_index, question))}`}
     >
       {answer.content.map((item: any, i_index: number) => (
         <div key={i_index} className=" flex flex-col justify-center">
@@ -55,7 +66,15 @@ const Answers = ({ a_index, answer, is_view, q_id, question }:
                 </span>
               )}
             {item.type == ITEM_TYPE.WORD && (
-              <InputWord a_index={a_index} i_index={i_index} className=" md:text-xl lg: text-xs border-b-[1px] text-center border-[#aaaaaa] mx-[3px]" is_view={is_view} q_id={q_id} />
+              <InputWord
+                a_index={a_index}
+                i_index={i_index}
+                className=" md:text-xl lg: text-xs border-b-[1px] text-center border-[#aaaaaa] mx-[3px]"
+                is_view={is_view}
+                question={question}
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
+              />
             )}
             {item.type == ITEM_TYPE.TEXT &&
               typeof item.data == "string" && (
@@ -73,15 +92,26 @@ const Answers = ({ a_index, answer, is_view, q_id, question }:
 const FillWordImage = ({
   question,
   is_view,
+  exam_result,
+  onAnswerQuestion,
 }: {
   question: QuestionRender;
   is_view?: boolean;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
   return (
     <div className="grid sm:grid-cols-2 xl:grid-cols-4 flex flex-row mt-5 justify-center">
       {question.answers.map((answer, a_index) => (
         <React.Fragment key={a_index}>
-          <Answers question={question} a_index={a_index} answer={answer} is_view={is_view} q_id={question.id} />
+          <Answers
+            question={question}
+            a_index={a_index}
+            answer={answer}
+            is_view={is_view}
+            exam_result={exam_result}
+            onAnswerQuestion={onAnswerQuestion}
+          />
         </React.Fragment>
       ))}
     </div>

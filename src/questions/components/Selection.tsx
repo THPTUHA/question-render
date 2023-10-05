@@ -1,8 +1,7 @@
-import React from "react";
 import { FaCheck } from "react-icons/fa";
-import { S_ANSWER_WRONG } from "question-convert";
-import { ExamFunctions } from "../../store/exam/functions";
-import { ExamHook } from "../../store/exam/hooks";
+import { QuestionRender, S_ANSWER_WRONG } from "question-convert";
+import { onAnswerQuestion } from "../types";
+import { getPupilAnswer, getQuestionSolution } from "../../utils";
 
 const getChecked = ({
   choose,
@@ -78,34 +77,35 @@ const Selection = ({
   id,
   a_index,
   i_index,
-  q_id,
+  question,
   choose,
   is_view,
+  onAnswerQuestion,
 }: {
   id: string;
   a_index: number;
   i_index: number;
-  q_id: number;
+  question: QuestionRender;
   choose?: string;
   is_view?: boolean;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
 
-  const answer_pupil = ExamHook.useAnswerPupil({ a_index, i_index ,q_id});
-  const solution = ExamHook.useSolution({ a_index, i_index, q_id });
-  const status = ExamHook.useQuestionStatus(q_id);
+  const answer_pupil = getPupilAnswer(question, { a_index, i_index});
+  const solution = getQuestionSolution(question,{ a_index, i_index });
   return (
     <div
       className={`flex h-8 w-8 items-center cursor-pointer 
                 justify-center relative border-2 rounded-md 
                 px-0.5 py-0.5 ${getChecked({
         choose,
-        status,
+        status: question.status,
         answer_pupil,
         is_view,
         solution,
       })}`}
       onClick={() => {
-        ExamFunctions.answer(
+        onAnswerQuestion(
           { a_index, i_index },
           choose !== undefined ? choose : id
         );
@@ -121,7 +121,7 @@ const Selection = ({
       <span
         className={`text-sm ${getChecked({
           choose,
-          status,
+          status: question.status,
           answer_pupil,
           is_view,
           solution,

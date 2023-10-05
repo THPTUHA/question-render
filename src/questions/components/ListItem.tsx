@@ -1,28 +1,28 @@
-import React from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { ElementRender } from "question-convert";
+import { EXAM_STATUS } from "../../constants";
 
 const ListItem = ({
   item,
   index,
   check,
-  is_doing,
+  exam_status,
 }: {
   item: ElementRender;
   index: number;
   check?: boolean;
-  is_doing?: any;
+  exam_status: number;
 }) => {
   return (
+    //@ts-ignore
     <Draggable draggableId={item.id} index={index}>
       {(provided) => {
         return (
           <div
             className={
-              is_doing === 3
-                ? `border-2 rounded-[5px] px-5 m-2 ${
-                check ? "border-[#22c55e]" : "border-[#ff0000]"
-                  }`
+              exam_status === EXAM_STATUS.VIEW
+                ? `border-2 rounded-[5px] px-5 m-2 ${check ? "border-[#22c55e]" : "border-[#ff0000]"
+                }`
                 : `border-2 rounded-[5px] border-dashed px-5 m-2 border-[#FF6700]`
             }
             ref={provided.innerRef}

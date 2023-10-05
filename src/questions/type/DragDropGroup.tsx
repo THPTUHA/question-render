@@ -1,4 +1,3 @@
-import React from "react";
 import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { DragDropContext, DropResult } from "react-beautiful-dnd";
@@ -11,7 +10,7 @@ import {
   QuestionRender,
 } from "question-convert";
 import { ITEM_TYPE } from "question-convert";
-import { ExamFunctions } from "../../store/exam/functions";
+import { onDragToBoard } from "../types";
 
 const DragDropContextContainer = styled.div`
   padding: 20px;
@@ -69,17 +68,21 @@ function DragDropGroup({
   question,
   is_view,
   preview,
+  onDragToBoard,
+  exam_status
 }: {
   question: QuestionRender;
   is_view?: boolean;
   preview?: boolean;
+  onDragToBoard: onDragToBoard,
+  exam_status: number,
 }) {
 
   const [elements, setElements] = useState<Elements>({});
   const [solution, setSolution] = useState<Elements>({});
 
   const lists = useMemo(() => {
-    let result: GroupComp[] = [];
+    let exam_result: GroupComp[] = [];
 
     const group = question.title.filter(
       (item) => item.type === ITEM_TYPE.GROUP
@@ -88,12 +91,12 @@ function DragDropGroup({
     if (group && typeof group.data == "object" && !Array.isArray(group.data)) {
       const keys = Object.keys(group.data);
       for (const key of keys) {
-        result.push({
+        exam_result.push({
           id: key,
           label: group.data[key],
         });
       }
-      result.push({
+      exam_result.push({
         id: MAIN_BOARD,
         label: [
           {
@@ -104,9 +107,9 @@ function DragDropGroup({
       });
     }
 
-    const elemets = generateLists(result, question.answers);
+    const elemets = generateLists(exam_result, question.answers);
     setElements(elemets);
-    return result;
+    return exam_result;
   }, [question]);
 
   useEffect(() => {
@@ -125,27 +128,27 @@ function DragDropGroup({
     setSolution(sol);
   }, [question]);
 
-  const onDragEnd = (result: DropResult) => {
-    if (!result.destination) {
+  const onDragEnd = (exam_result: DropResult) => {
+    if (!exam_result.destination) {
       return;
     }
     const listCopy = { ...elements };
 
-    ExamFunctions.dragToBoard({
-      src_index: result.source.index,
-      src_label: result.source.droppableId,
-      dist_index: result.destination.index,
-      dist_label: result.destination.droppableId,
+    onDragToBoard({
+      src_index: exam_result.source.index,
+      src_label: exam_result.source.droppableId,
+      dist_index: exam_result.destination.index,
+      dist_label: exam_result.destination.droppableId,
     });
-    const sourceList = listCopy[result.source.droppableId];
-    const removedElement = removeFromList(sourceList, result.source.index);
+    const sourceList = listCopy[exam_result.source.droppableId];
+    const removedElement = removeFromList(sourceList, exam_result.source.index);
 
-    listCopy[result.source.droppableId] = sourceList;
+    listCopy[exam_result.source.droppableId] = sourceList;
 
-    const destinationList = listCopy[result.destination.droppableId];
-    listCopy[result.destination.droppableId] = addToList(
+    const destinationList = listCopy[exam_result.destination.droppableId];
+    listCopy[exam_result.destination.droppableId] = addToList(
       destinationList,
-      result.destination.index,
+      exam_result.destination.index,
       removedElement
     );
     setElements(listCopy);
@@ -171,6 +174,7 @@ function DragDropGroup({
                     label={comp.label}
                     solution={solution}
                     preview={preview}
+                    exam_status={exam_status}
                   />
                 </span>
               )
@@ -185,6 +189,7 @@ function DragDropGroup({
                     elements={elements[comp.id]}
                     key={index}
                     prefix={comp.id}
+                    exam_status={exam_status}
                   />
                 )
             )}

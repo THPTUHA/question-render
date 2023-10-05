@@ -1,6 +1,5 @@
 import React, { useMemo } from "react";
-import { ITEM_TYPE, S_ANSWER_CORRECT, S_ANSWER_WRONG, S_UNANSWER } from "question-convert";
-import { ExamHook } from "../../store/exam/hooks";
+import { AnswerRender, ExamResult, ITEM_TYPE, S_ANSWER_CORRECT, S_ANSWER_WRONG, S_UNANSWER } from "question-convert";
 import { QuestionRender } from "question-convert";
 import AudioPlay from "../components/AudioPlay";
 import Image from "../components/Image";
@@ -8,16 +7,29 @@ import Selection from "../components/Selection";
 import Text from "../components/Text";
 import checkCorectSolution from "../../helper/checkCorectSolution";
 import checkStatusAnswer from "../../helper/checkStatusAnswer";
+import { onAnswerQuestion } from "../types";
 
-const Answers = ({ a_index, answer, is_view, q_id, question }: { a_index: any, answer: any, is_view: any, q_id:number, question: any}) => {
-  // const questionCurrent: any = ExamHook.useQuestionCurrent();
-  const result = ExamHook.useResult();
+const Answers = ({
+  a_index,
+  answer,
+  is_view,
+  question,
+  exam_result,
+  onAnswerQuestion,
+}: {
+  a_index: number,
+  answer: AnswerRender,
+  is_view?: boolean,
+  question: QuestionRender,
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
+}) => {
   const checkAns = useMemo(() => {
     let check_result = S_UNANSWER;
     answer.content.map((_: any, i_index: any) => {
       let key = a_index + '#' + i_index;
-      if(question.answer_pupil[key]){
-        if(question.answer_pupil[key] === question.solutions[key]){
+      if (question.answer_pupil[key]) {
+        if (question.answer_pupil[key] === question.solutions[key]) {
           check_result = S_ANSWER_CORRECT
         } else {
           check_result = S_ANSWER_WRONG
@@ -32,16 +44,17 @@ const Answers = ({ a_index, answer, is_view, q_id, question }: { a_index: any, a
       key={a_index}
       className={`border-2 border-dashed rounded-[10px] 
                   border-[#FF6700] mx-2 mt-10 p-3 flex 
-                  flex-col ${result && (!is_view ? checkStatusAnswer(checkAns) : checkCorectSolution(answer, a_index, question))}`}
+                  flex-col ${exam_result && (!is_view ? checkStatusAnswer(checkAns) : checkCorectSolution(answer, a_index, question))}`}
     >
       {answer.content.length > 0 && (
         <div className="w-10 h-10">
           <Selection
             id={answer.id}
+            question={question}
             a_index={a_index}
             i_index={0}
-            q_id={q_id}
             is_view={is_view}
+            onAnswerQuestion={onAnswerQuestion}
           />
         </div>
       )}
@@ -73,13 +86,30 @@ const Answers = ({ a_index, answer, is_view, q_id, question }: { a_index: any, a
   )
 }
 
-const SelectImageTA003 = ({ question, is_view }: { question: QuestionRender, is_view ?: boolean }) => {
+const SelectImageTA003 = ({
+  question,
+  is_view,
+  exam_result,
+  onAnswerQuestion,
+}: {
+  question: QuestionRender,
+  is_view?: boolean,
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
+}) => {
   return (
     <div className="flex xs:grid-cols-2 flex-row justify-center">
       {question.answers.map((answer, a_index) => {
         return (
           <React.Fragment key={a_index}>
-            <Answers question={question} a_index={a_index} answer={answer} is_view={is_view} q_id ={question.id}/>
+            <Answers
+              question={question}
+              a_index={a_index}
+              answer={answer}
+              is_view={is_view}
+              exam_result={exam_result}
+              onAnswerQuestion={onAnswerQuestion}
+            />
           </React.Fragment>
         )
       })}

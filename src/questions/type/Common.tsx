@@ -1,11 +1,11 @@
 import React, { useMemo } from "react";
 import {
+  ExamResult,
   ITEM_TYPE,
   S_ANSWER_CORRECT,
   S_ANSWER_WRONG,
   S_UNANSWER,
 } from "question-convert";
-import { ExamHook } from "../../store/exam/hooks";
 import { QuestionRender } from "question-convert";
 import AudioPlay from "../components/AudioPlay";
 import DropList from "../components/DropList";
@@ -15,22 +15,23 @@ import Input from "../components/Input";
 import Text from "../components/Text";
 import checkCorectSolution from "../../helper/checkCorectSolution";
 import checkStatusAnswer from "../../helper/checkStatusAnswer";
+import { onAnswerQuestion } from "../types";
 
 const Answers = ({
   a_index,
   answer,
   is_view,
-  q_id,
-  question
+  question,
+  exam_result,
+  onAnswerQuestion,
 }: {
   a_index: any;
   answer: any;
   is_view: any;
-  q_id: number;
-  question: any;
+  question: QuestionRender;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
-  // const questionCurrent: any = ExamHook.useQuestionCurrent();
-  const result = ExamHook.useResult();
   const checkAns = useMemo(() => {
     let check_result = S_UNANSWER;
     answer.content.map((_: any, i_index: any) => {
@@ -52,7 +53,7 @@ const Answers = ({
     <div
       className={`flex-wrap border-2 mx-20 mt-10 p-5 items-center
                   border-dashed text-center rounded-[10px] border-[#FF6700]
-                  ${result &&
+                  ${exam_result &&
         (!is_view
           ? checkStatusAnswer(checkAns)
           : checkCorectSolution(answer, a_index, question))
@@ -72,7 +73,10 @@ const Answers = ({
                 a_index={a_index}
                 i_index={i_index}
                 is_view={is_view}
-                q_id={q_id}
+                question={question}
+                className=""
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
               />
             </span>
           )}
@@ -83,7 +87,9 @@ const Answers = ({
                 i_index={i_index}
                 className="w-12 text-center border-2 mx-2 rounded-[5px]"
                 is_view={is_view}
-                q_id={q_id}
+                question={question}
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
               />
             </span>
           )}
@@ -94,7 +100,9 @@ const Answers = ({
                 a_index={a_index}
                 i_index={i_index}
                 is_view={is_view}
-                q_id={q_id}
+                question={question}
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
               />
             </span>
           )}
@@ -107,9 +115,13 @@ const Answers = ({
 const Common = ({
   question,
   is_view,
+  exam_result,
+  onAnswerQuestion,
 }: {
   question: QuestionRender;
   is_view?: boolean;
+  exam_result: ExamResult | null;
+  onAnswerQuestion: onAnswerQuestion;
 }) => {
   return (
     <div className="">
@@ -142,7 +154,8 @@ const Common = ({
                 a_index={a_index}
                 answer={answer}
                 is_view={is_view}
-                q_id={question.id}
+                exam_result={exam_result}
+                onAnswerQuestion={onAnswerQuestion}
               />
             </React.Fragment>
           </div>
