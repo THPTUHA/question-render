@@ -21,8 +21,11 @@ type State = {
 }
 
 class TitleQuestion extends Component<Props, State> {
-  state: State = {
-    item_renders: []
+  constructor(props: Props){
+    super(props)
+    this.state = {
+      item_renders: []
+    }
   }
   componentDidMount() {
     this.calculateItemRenders();

@@ -112,9 +112,9 @@ export const handleContentRender = (
         // case QUESTION_TYPE.TV_006: //checked
         // case QUESTION_TYPE.TA_006:
         //     return <TV006 {...func} question={question} exam_status={exam_status} is_view={is_view} is_multi={true}/>; 
-        // case QUESTION_TYPE.TV_007:
-        // case QUESTION_TYPE.TA_007:
-        //     return <TV007 {...func} question={question} exam_result={exam_result} is_view={is_view} />;
+        case QUESTION_TYPE.TV_007:
+        case QUESTION_TYPE.TA_007:
+            return <TV007 {...func} question={question} exam_result={exam_result} is_view={is_view} />;
         // case QUESTION_TYPE.TV_008:
         // case QUESTION_TYPE.TA_008:
         //     return <TV008 {...func} question={question} exam_result={exam_result} is_view={is_view} />;
@@ -128,9 +128,9 @@ export const handleContentRender = (
         // case QUESTION_TYPE.TV_013: //checked
         // case QUESTION_TYPE.TA_013:
         //     return <TV013 {...func} question={question} exam_result={exam_result} is_view={is_view} />;
-        // case QUESTION_TYPE.TV_014:
-        // case QUESTION_TYPE.TA_014:
-        //     return <TV014 {...func} question={question} exam_result={exam_result} is_view={is_view} />;
+        case QUESTION_TYPE.TV_014:
+        case QUESTION_TYPE.TA_014:
+            return <TV014 {...func} question={question} exam_result={exam_result} is_view={is_view} />;
         default:
             return <></>;
     }
